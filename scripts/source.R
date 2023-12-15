@@ -1,23 +1,63 @@
+library(ggh4x)
 library(httr)
 library(jsonlite)
+library(rrapply)
 library(sf)
-library(tidyverse)
+library(tidytransit)
+library(timetk)
+library(plotly)
 
-TIME_BEGIN <- "00:00"
-TIME_END <- "23:59"
-DATE_START <- "04-15-2023"
-DATE_END <- "04-17-2023"
-DAYS_OF_WEEK <- "1,2,3,4,5"
+# source main functions ---------------------------------------------------
 
-DATE_EXCLUDE <- ""
+fxn_source = list.files("scripts", 
+                        pattern = "^fxn_.*.R$", full.names = T, ignore.case = T)
+sapply(fxn_source, source, .GlobalEnv)
 
-#' fix routes of route list
-#' 
-#' @param route_list
-#' @returns formatted route list
-fix_routes <- function(route_list){
+source("scripts/otis_setup.R")
+
+# helper functions --------------------------------------------------------
+
+pct_diff <- function(t1, t2) {
+  t1 = as.numeric(t1)
+  t2 = as.numeric(t2)
   
-  char_vect <- c(`331` = "33S",
+  return((t1 - t2) / ((t1 + t2) / 2))
+}
+
+pct_chg <- function(t1, t2) {
+  t1 = as.numeric(t1)
+  t2 = as.numeric(t2)
+  
+  return((t2 - t1) / abs(t1))
+}
+
+quant_num <- function(speed, level) {
+  as.numeric(unlist(quantile(speed, probs=c(level), na.rm = TRUE)))
+}
+
+coord_y_datetime <- function(xlim = NULL, ylim = NULL, expand = TRUE) {
+  if (!is.null(ylim)) {
+    ylim <- lubridate::as_datetime(ylim)
+  }
+  ggplot2::coord_cartesian(xlim = xlim, ylim = ylim, expand = expand)
+}
+
+# parameters --------------------------------------------------------------
+
+DATE_START_MIN <- "02-01-2020"
+DATE_END_MAX <- "12-31-2023"
+DATE_EXCLUDE <- "07-04-2019,07-04-2023"
+DAYS_OF_WEEK <- "2,3,4"
+
+time_int <- list(preAM = c("04:00","05:59"),
+                 AMpeak = c("06:00","08:59"),
+                 base = c("09:00","14:59"),
+                 PMpeak = c("15:00","17:59"),
+                 evening = c("18:00","21:59"),
+                 latenight = c("22:00","23:59"),
+                 owl = c("00:00","04:59"))
+
+route_alias <- c(`331` = "33S",
                  `101` = "10B",
                  `471` = "47M",
                  `701` = "BSO",
@@ -40,10 +80,5 @@ fix_routes <- function(route_list){
                  `801` = "H",
                  `802` = "XH",
                  `500` = "BLVDDIR")
-  
-  output <- recode(route_list, !!!char_vect)
-  
-  #output <- list_modify(route_list, `500` = "BLVDDIR")
-  
-  return(output)
-}
+
+swiftly_api_historical <- "7940c6ffb397e212179ffed1355bd9ef"

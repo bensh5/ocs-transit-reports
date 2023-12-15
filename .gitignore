@@ -48,6 +48,7 @@ po/*~
 # RStudio Connect folder
 rsconnect/
 
-data/gtfs
-data/google*.zip
+data/gtfs.public.zip
+data/google_*.zip
+data/stop_*.zip
 
