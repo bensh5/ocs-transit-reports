@@ -1,34 +1,34 @@
+library(ggh4x)
+library(hms)
+library(lubridate)
+library(readxl)
 library(tidyverse)
 library(RColorBrewer)
 library(scico)
 library(scales)
-library(lubridate)
-library(hms)
-library(readxl)
-
 
 # City/OTIS color palette -------------------------------------------------
 
 pal_phila <- c(
   dark_ben_franklin  = "#0f4d90",
-  ben_franklin_blue  = "#2176d2",
-  light_ben_franklin = "#96c9ff",
-  electric_blue      = "#25cef7",
   bell_yellow        = "#f3c613",
   flyers_orange      = "#f99300",
   kelly_drive_green  = "#58c04d",
+  love_park_red      = "#cc3000",
+  ben_franklin_blue  = "#2176d2",
+  light_ben_franklin = "#96c9ff",
+  electric_blue      = "#25cef7",
   light_bell         = "#ffefa2",
   light_red          = "#fed0d0",
   light_kelly_drive  = "#b9f2b1",
   light_blue         = "#DAEDFE",
   phanatic_green     = "#3a833c",
-  love_park_red      = "#cc3000",
   pride_purple       = "#9400c6",
   black              = "#000000",
   dark_gray          = "#444444",
   medium_gray        = "#a1a1a1",
   sidewalk           = "#cfcfcf"
-  )
+)
 
 pal_connect <- c(
   connect_green   = "#00af41",
@@ -58,13 +58,13 @@ get_colors <- function(..., palette = pal_phila) {
 
 pal_phila_list <- list(
   main = get_colors("ben_franklin_blue",
-                    "light_ben_franklin",
                     "bell_yellow",
+                    "pride_purple",
                     "kelly_drive_green",
-                    "flyers_orange",
+                    "love_park_red",
                     "medium_gray",
                     "pride_purple",
-                    "love_park_red"),
+                    "ben_franklin_blue"),
   dark = get_colors("dark_ben_franklin", "phanatic_green", "love_park_red",
                     "pride_purple", "dark_gray"),
   light = get_colors("light_blue", "light_bell", "light_red", "light_kelly_drive"),
@@ -159,6 +159,11 @@ theme_otis <- function(...,
         size = base_size,
         family = font[2],
         color = "#444444"
+      ),
+      strip.text = element_text(
+        size = base_size,
+        family = font[1],
+        hjust = 0
       ),
       panel.grid.minor = element_blank(),
       plot.background = element_rect(fill = '#FFFFFF', color = '#FFFFFF'),

@@ -1,15 +1,15 @@
-#' Main Swiftly corridor function
+#' Swiftly corridor runtimes function
 #'
 #' @param cor_routes corridor routes processed from build function
+#' @param cor single corridor from cor_routes
 #' @param yearmon year-month to process one month of runtime data
-#' @param gtfs gtfs to use
 #' @return a tidy panel dataframe of stop runtimes for one month
 #' @export
 #'
-get_swiftly_cor_panel <- function(cor_routes, cor, yearmon) {
+get_cor_runtime_panel <- function(cor_routes, cor, yearmon) {
   dates <- c(format(ym(yearmon), "%m-%d-%Y"), 
              format(ceiling_date(ym(yearmon)+months(1)-days(1)), "%m-%d-%Y"))
-  
+
   cor_routes <- cor_routes |> filter(corridor %in% cor)
   
   cor_stops <- cor_routes |> distinct(stop_id, .keep_all = T) |> 
@@ -58,6 +58,30 @@ get_swiftly_cor_panel <- function(cor_routes, cor, yearmon) {
     relocate(stopOrderCor, .after = stopOrder)
   
   cor_routestops_runtimes_panel
+}
+
+#' Swiftly corridor speed function
+#'
+#' @param cor_routes corridor routes processed from build function
+#' @param cor single corridor from cor_routes
+#' @param yearmon year-month to process one month of runtime data
+#' @return a tidy panel dataframe of stop runtimes for one month
+#' @export
+#'
+get_cor_speed_panel <- function(cor_routes, cor, yearmon) {
+  dates <- c(format(ym(yearmon), "%m-%d-%Y"), 
+             format(ceiling_date(ym(yearmon)+months(1)-days(1)), "%m-%d-%Y"))
+  
+  cor_routes_distinct <- cor_routes |> distinct(route_id, direction_id)
+  
+  cor_routes_speeds <- map2(cor_routes_distinct$route_id,
+                            str_sub(cor_routes_distinct$direction_id,-1), 
+                            \(x,y) get_speedmap_low(route = x,
+                                                     direction = y,
+                                                     startDate = dates[1],
+                                                     endDate = dates[2]))
+  
+  return(bind_rows(cor_routes_speeds))
 }
 
 #' Takes in complete corridor route-stops panel and computes descriptive stats

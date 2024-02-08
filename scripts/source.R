@@ -4,6 +4,7 @@ library(jsonlite)
 library(rrapply)
 library(sf)
 library(tidytransit)
+library(tidyverse)
 library(timetk)
 library(plotly)
 
@@ -80,5 +81,7 @@ route_alias <- c(`331` = "33S",
                  `801` = "H",
                  `802` = "XH",
                  `500` = "BLVDDIR")
+
+route_exclude <- c("MFO", "BSO", "HRS", "HXH", "KLS", "KSL", "WCS", "WPA", "WPS")
 
 swiftly_api_historical <- "7940c6ffb397e212179ffed1355bd9ef"

@@ -40,6 +40,8 @@ build_route_stop <- function(f_gtfs) {
 #' @param cor_name corridor names to filter to
 #' @return stop-level dataset of corridor stops w/ direction, sequence
 build_corridor <- function(f_corridors, f_gtfs, f_filter = F, cor_name) {
+  route_stops <- build_route_stop(f_gtfs)
+  
   # read corridors file
   corridors <- read_csv(f_corridors) |> 
     pivot_longer(cols = c(start, end), 
@@ -49,20 +51,21 @@ build_corridor <- function(f_corridors, f_gtfs, f_filter = F, cor_name) {
   #filter for specific corridor name
   corridors <- if(f_filter) filter(corridors, corridor %in% cor_name) else corridors
   
-  route_stops <- build_route_stop(f_gtfs)
-  
   # merge with GTFS intake
   corridors <- corridors |> 
     left_join(route_stops |> 
                 select(stop_id, route_id, direction_id, stop_sequence) |> 
                 st_drop_geometry(), by = "stop_id", relationship = "many-to-many") |> 
-    group_by(subcorridor, route_id, direction_id) |> filter(n() > 1) |> ungroup()
+    group_by(subcorridor, route_id, direction_id) |> 
+    filter(n() > 1 & !(route_id %in% route_exclude)) |> 
+    ungroup()
 
   # With multiple routes on a corridor, direction_id can be arbitrarily 0 or 1
   # and is not automatically consistent with the corridor compass direction.
   # We define 0 as EB/NB and 1 as WB/SB, and have to switch direction_id if necessary.
   routes_dir_change <- corridors |> 
-    mutate(dir_change = direction_compass %in% c('NB','EB') & direction_id == 1) |> 
+    mutate(dir_change = (direction_compass %in% c('NB','EB') & direction_id == 1) |
+                        (direction_compass %in% c('SB','WB') & direction_id == 0)) |> 
     arrange(-dir_change) |> distinct(route_id, .keep_all = T) |> 
     select(route_id, dir_change)
   
@@ -90,7 +93,7 @@ build_corridor <- function(f_corridors, f_gtfs, f_filter = F, cor_name) {
     mutate(direction_id = paste0("direction-",direction_id)) |> 
     nest(.by = c(corridor, subcorridor, stop_id, stop_name, direction_id, direction_compass, marker)) |> 
     group_by(subcorridor, direction_id) |> mutate(stopOrderCor = row_number()) |> 
-    unnest(data) |> arrange(corridor, subcorridor, direction_id, direction_compass, stopOrderCor) |> 
+    unnest(data) |> arrange(route_id, corridor, subcorridor, direction_id, direction_compass, stopOrderCor) |> 
     relocate(stopOrderCor, .after = stop_sequence) |> ungroup()
   
   return(route_stops_cor)
