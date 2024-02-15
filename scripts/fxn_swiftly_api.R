@@ -99,7 +99,7 @@ get_runtime_by_stop <- function(api_key = swiftly_api_historical, agencyKey = "s
   return(x)
 }
 
-#' Get speed map (low or high resolution)
+#' Get speed map (low resolution is more usable)
 #' 
 #' @param routeKey single route
 #' @param tripKey single trip
@@ -112,7 +112,6 @@ get_speedmap <- function(speed = "low", api_key = swiftly_api_historical,
   
   url = paste0("https://api.goswift.ly/speed-map/septa/", speed, "-resolution/")
   
-  # api call function
   res <- GET(url, query = list(route = route, direction = direction, 
                                beginTime = beginTime, endTime = endTime,
                                startDate = startDate, endDate = endDate,
@@ -145,15 +144,20 @@ get_trip_observations <- function(api_key = swiftly_api_historical, agencyKey = 
   
   url = paste0("https://api.goswift.ly/run-times/septa/trip-observations/")
   
-  # api call function
-  res <- GET(url, query = list(tripId = tripId, routes = routes, directionId = directionId,
-                               beginTime = beginTime, endTime = endTime, format = format,
-                               startDate = startDate, endDate = endDate, daysOfWeek = daysOfWeek),
-             add_headers(Authorization = swiftly_api_historical))
+  f <- function() {
+    res <- GET(url, query = list(tripId = tripId, routes = routes, directionId = directionId,
+                                 beginTime = beginTime, endTime = endTime, format = format,
+                                 startDate = startDate, endDate = endDate, daysOfWeek = daysOfWeek),
+               add_headers(Authorization = swiftly_api_historical))
+    
+    return(res)
+  }
+
+  dat <- (f)
   
-  x <- fromJSON(res$content |> rawToChar())$data$byStopRuntimeDatas
+  x <- fromJSON(dat$content |> rawToChar())$data$byStopRuntimeDatas
   
-  code <- ifelse(res$status_code == "200", 
+  code <- ifelse(dat$status_code == "200", 
                  paste0("Route:", routeId, ", Trip:", tripId, ", Direction:", directionId, " OK"),
                  paste("Error", res$status_code, "Route", routeId, "Trip", tripId,))
   

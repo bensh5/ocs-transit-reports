@@ -1,10 +1,8 @@
-
 #' Get latest SEPTA GTFS. Only run intermittently
 #' 
 #' @return SEPTA rail and bus GTFS
-get_gtfs_septa <- function() {
-  download.file("https://github.com/septadev/GTFS/releases/latest/download/gtfs_public.zip",
-                destfile = zip.file)
+get_gtfs_septa <- function(url = "https://github.com/septadev/GTFS/releases/latest/download/gtfs_public.zip") {
+  download.file(url, destfile = zip.file)
   
   unzip(zip.file, exdir = "data")
   #unzip("data/google_bus.zip", exdir = "data/gtfs")
@@ -29,7 +27,7 @@ build_route_stop <- function(f_gtfs) {
     arrange(route_id, direction_id, stop_sequence)
 }
 
-#' Build the analysis corridors by route according to supplied GTFS. 
+#' Build the route-agnostic analysis corridors according to supplied GTFS. 
 #' Each corridor can contain the stops of multiple routes that traverse it, 
 #' as well as subcorridors according to project phasing.
 #' 

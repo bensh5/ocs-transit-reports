@@ -55,6 +55,7 @@ get_cor_runtime_panel <- function(cor_routes, cor, yearmon) {
     filter(stopId %in% cor_stops$stop_id) |> 
     left_join(select(cor_stops, subcorridor, stop_id, stopOrderCor), 
               by = c("stopId" = "stop_id"), relationship = "many-to-many") |> 
+    mutate(excessTravel = travelTime - fixedTravel) |> # added this metric
     relocate(stopOrderCor, .after = stopOrder)
   
   cor_routestops_runtimes_panel
@@ -87,19 +88,26 @@ get_cor_speed_panel <- function(cor_routes, cor, yearmon) {
 #' Takes in complete corridor route-stops panel and computes descriptive stats
 #' 
 #' @return dataframe of descriptive stats for corridor
-get_stats_descriptive <- function(panel) {
+get_stats_descriptive <- function(panel, interval) {
   stat_sum <- panel |> group_by(subcorridor, direction, stopOrderCor, stopId, stopName) |> 
-    summarise_by_time(.date_var = depTime, .by = "10 minutes",
+    summarise_by_time(.date_var = depTime, .by = interval,
     tripCount = n(),
-    m_dwellTime = mean(dwellTime),
-    m_travelTime = mean(travelTime),
-    m_runTime = mean(runTime),
+    m_dwellTime = mean(dwellTime, na.rm = T),
+    m_travelTime = mean(travelTime, na.rm = T),
+    m_runTime = mean(runTime, na.rm = T),
+    m_excessTravel = mean(excessTravel, na.rm = T),
     sd_dwellTime = sd(dwellTime),
     sd_travelTime = sd(travelTime),
     sd_runTime = sd(runTime),
+    sd_excessTravel = sd(excessTravel),
     p10_travelTime = quant_num(travelTime, 0.1),
     p90_travelTime = quant_num(travelTime, 0.9),
     p95_travelTime = quant_num(travelTime, 0.95),
+    p10_runTime = quant_num(runTime, 0.1),
+    p90_runTime = quant_num(runTime, 0.9),
+    p95_runTime = quant_num(runTime, 0.95),
+    buf_indx_runTime = (p95_runTime - m_runTime) / m_runTime,
+    buf_time_runTime = as.duration(m_runTime) * (1 + buf_indx_runTime)
   ) |> 
   mutate(stopName = str_sub(str_extract(stopName, "&[:blank:].*"),3,-1),
          stopName = fct_reorder(stopName, stopOrderCor))

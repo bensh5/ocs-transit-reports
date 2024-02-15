@@ -1,8 +1,3 @@
-library(ggh4x)
-library(hms)
-library(lubridate)
-library(readxl)
-library(tidyverse)
 library(RColorBrewer)
 library(scico)
 library(scales)

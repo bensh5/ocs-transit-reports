@@ -1,5 +1,8 @@
+library(config)
 library(ggh4x)
+library(hms)
 library(httr)
+library(lubridate)
 library(jsonlite)
 library(rrapply)
 library(sf)
@@ -43,12 +46,17 @@ coord_y_datetime <- function(xlim = NULL, ylim = NULL, expand = TRUE) {
   ggplot2::coord_cartesian(xlim = xlim, ylim = ylim, expand = expand)
 }
 
-# parameters --------------------------------------------------------------
+# default parameters, constant across all corridors -----------------------
+
+swiftly_api_historical <- "7940c6ffb397e212179ffed1355bd9ef"
+GTFS_FILE <- "data/google_bus.zip"
+CORRIDOR_FILE <- "data/corridors.csv"
 
 DATE_START_MIN <- "02-01-2020"
-DATE_END_MAX <- "12-31-2023"
-DATE_EXCLUDE <- "07-04-2019,07-04-2023"
+DATE_END_MAX <- "12-31-2024"
+DATE_EXCLUDE <- "07-04-2019,07-04-2022"
 DAYS_OF_WEEK <- "2,3,4"
+INTERVAL_BIN = "10 minutes"
 
 time_int <- list(preAM = c("04:00","05:59"),
                  AMpeak = c("06:00","08:59"),
@@ -83,5 +91,3 @@ route_alias <- c(`331` = "33S",
                  `500` = "BLVDDIR")
 
 route_exclude <- c("MFO", "BSO", "HRS", "HXH", "KLS", "KSL", "WCS", "WPA", "WPS")
-
-swiftly_api_historical <- "7940c6ffb397e212179ffed1355bd9ef"

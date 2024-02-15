@@ -18,8 +18,8 @@ map2(study_panel_stats, names(study_panel_stats), \(x,y) plot_runtime_onecor(x, 
 
 # before/after comparision visualization ----------------------------------
 
-before <- read_csv(paste0("out/runtimes_", "Chestnut", "_before.csv"))
-after <- read_csv(paste0("out/runtimes_", "Chestnut", "_after.csv"))
+before <- read_csv(paste0("out/runtimes_", study_cor[1], "_before.csv"))
+after <- read_csv(paste0("out/runtimes_", study_cor[1], "_after.csv"))
 
 comp <- left_join(before, after, by = c("subcorridor", "direction", "stopOrderCor",
                                         "stopId", "stopName", "depTime")) |> 
