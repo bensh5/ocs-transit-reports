@@ -17,7 +17,7 @@ fxn_source = list.files("scripts",
                         pattern = "^fxn_.*.R$", full.names = T, ignore.case = T)
 sapply(fxn_source, source, .GlobalEnv)
 
-source("scripts/otis_setup.R")
+source("scripts/otis_aes.R")
 
 # helper functions --------------------------------------------------------
 
@@ -56,7 +56,7 @@ DATE_START_MIN <- "02-01-2020"
 DATE_END_MAX <- "12-31-2024"
 DATE_EXCLUDE <- "07-04-2019,07-04-2022"
 DAYS_OF_WEEK <- "2,3,4"
-INTERVAL_BIN = "10 minutes"
+INTERVAL_BIN <- "10 minutes"
 
 time_int <- list(preAM = c("04:00","05:59"),
                  AMpeak = c("06:00","08:59"),

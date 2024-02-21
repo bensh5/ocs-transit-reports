@@ -1,18 +1,16 @@
-
 # Set this environment variable according to your project config name in config.yml
-Sys.setenv(R_CONFIG_ACTIVE = "19th")
+Sys.setenv(R_CONFIG_ACTIVE = "nineteenth")
 
 source("scripts/source.R")
 
-study_cor <- config::get("study_cor")
-dates <- config::get("dates")
+study_cor <- c(config::get("study_cor_1"), config::get("study_cor_2"))
+dates <- c(config::get("date_before"), config::get("date_after"))
 
 study_pop <- expand_grid(study_cor, dates)
 study_pop$epoch <- names(dates[match(study_pop$dates, dates)])
 
 gtfs <- read_gtfs(GTFS_FILE)
 cor_routes <- build_corridor(CORRIDOR_FILE, gtfs, T, study_cor)
-
 
 # study_panel <- map2(study_pop[1], study_pop[2], get_cor_runtime_panel,
 #                     cor_routes = cor_routes)
@@ -32,6 +30,6 @@ study_panel <- list(paste0(study_cor[1], "_before") = cor1_before,
 study_panel_stats <- study_panel |> map(\(x) get_stats_descriptive(x, INTERVAL_BIN))
 mapply(write_csv, study_panel_stats, paste0("out/runtimes_",names(study_panel_stats),".csv"))
 
-# stop spacing ------------------------------------------------------------
+# stop spacing (WIP) ------------------------------------------------------
 
 septa_route_stop <- build_route_stop(septa)

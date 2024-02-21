@@ -11,7 +11,7 @@ get_gtfs_septa <- function(url = "https://github.com/septadev/GTFS/releases/late
 }
 
 
-#' Build GTFS route-stop board
+#' Build GTFS-derived route-stop board
 #'
 #' @param f_gtfs 
 #'
@@ -32,7 +32,8 @@ build_route_stop <- function(f_gtfs) {
 #' as well as subcorridors according to project phasing.
 #' 
 #' @param f_corridors corridors CSV, formatted as: 
-#' corridor name, subcorridor name, compass direction, start stop, end stop
+#' corridor name, subcorridor name, compass direction, start stop ID, end stop ID
+#' (Find stop IDs through)
 #' @param f_gtfs gtfs ZIP
 #' @param f_filter should corridors CSV be filtered to single corridor of interest?
 #' @param cor_name corridor names to filter to
@@ -46,7 +47,7 @@ build_corridor <- function(f_corridors, f_gtfs, f_filter = F, cor_name) {
                  names_to = "marker", values_to = "stop_id") |> 
     mutate(stop_id = as.character(stop_id))
   
-  #filter for specific corridor name
+  #filter for specific corridor name(s)
   corridors <- if(f_filter) filter(corridors, corridor %in% cor_name) else corridors
   
   # merge with GTFS intake

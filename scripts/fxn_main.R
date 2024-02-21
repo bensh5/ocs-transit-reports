@@ -89,7 +89,8 @@ get_cor_speed_panel <- function(cor_routes, cor, yearmon) {
 #' 
 #' @return dataframe of descriptive stats for corridor
 get_stats_descriptive <- function(panel, interval) {
-  stat_sum <- panel |> group_by(subcorridor, direction, stopOrderCor, stopId, stopName) |> 
+  stat_sum <- panel |> 
+    group_by(subcorridor, direction, stopOrderCor, stopId, stopName) |> 
     summarise_by_time(.date_var = depTime, .by = interval,
     tripCount = n(),
     m_dwellTime = mean(dwellTime, na.rm = T),

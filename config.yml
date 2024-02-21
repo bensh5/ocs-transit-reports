@@ -1,7 +1,17 @@
-chestnut:
-  study_cor: c("Chestnut", "Walnut")
-  dates: c("before"="2019-10", "after"="2023-10")
+default:
+  study_cor_1: "Market"
+  study_cor_2: "JFK"
+  date_before: "2019-10"
+  date_after:  "2023-10"
 
-19th:
-  study_cor: c("19th", "Market")
-  dates: c("before"="2019-10", "after"="2023-10")
+chestnut:
+  study_cor_1: "Chestnut"
+  study_cor_2: "Walnut"
+  date_before: "2019-10"
+  date_after:  "2023-10"
+
+nineteenth:
+  study_cor_1: "19th"
+  study_cor_2: "Market"
+  date_before: "2019-10"
+  date_after:  "2023-10"
